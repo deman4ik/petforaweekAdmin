@@ -143,13 +143,18 @@ var AriclesEditor = React.createClass({
 	},
 	//загрузка данных статей
 	getArticles: function () {
-		this.props.onDisplayProgress(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_PROGRESS"}));
-		var getPrms = {
-			language: this.props.language,
-			addLanguage: false,
-			filter: {}
+		if(this.props.session.loggedIn) {
+			this.setState({articlesLoaded: false});
+			this.props.onDisplayProgress(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_PROGRESS"}));
+			var getPrms = {
+				language: this.props.language,
+				addLanguage: false,
+				filter: {}
+			}
+			clnt.getArticles(getPrms, this.handleGetArticlesResult);
+		} else {
+			this.setState({articlesLoaded: true});
 		}
-		clnt.getArticles(getPrms, this.handleGetArticlesResult);		
 	},
 	//добавление статьи
 	insertArticle: function (article) {
@@ -262,24 +267,26 @@ var AriclesEditor = React.createClass({
 		}
 		//соберем представление
 		var content;
-		if(this.props.session.loggedIn) {
-			content =	<div style={divStyle}>
-							{iuForm}
-							<div style={divStyle}>
-								<a href="javascript:void(0)" onClick={this.onArticleAddClick}>
-									<strong>{Utils.getStrResource({lang: this.props.language, code: "UI_BTN_INSERT"})}</strong>
-								</a>
+		if(this.state.articlesLoaded) {
+			if(this.props.session.loggedIn) {
+				content =	<div style={divStyle}>
+								{iuForm}
+								<div style={divStyle}>
+									<a href="javascript:void(0)" onClick={this.onArticleAddClick}>
+										<strong>{Utils.getStrResource({lang: this.props.language, code: "UI_BTN_INSERT"})}</strong>
+									</a>
+								</div>
+								{articles}
+								<div style={divStyle}>
+									<a href="javascript:void(0)" onClick={this.onArticleAddClick}>
+										<strong>{Utils.getStrResource({lang: this.props.language, code: "UI_BTN_INSERT"})}</strong>									
+									</a>
+								</div>
 							</div>
-							{articles}
-							<div style={divStyle}>
-								<a href="javascript:void(0)" onClick={this.onArticleAddClick}>
-									<strong>{Utils.getStrResource({lang: this.props.language, code: "UI_BTN_INSERT"})}</strong>									
-								</a>
-							</div>
-						</div>
-		} else {
-			content =	<InLineMessage type={Utils.getMessageTypeErr()}
-							message={Utils.getStrResource({lang: this.props.language, code: "SRV_UNAUTH"})}/>
+			} else {
+				content =	<InLineMessage type={Utils.getMessageTypeErr()}
+								message={Utils.getStrResource({lang: this.props.language, code: "SRV_UNAUTH"})}/>
+			}
 		}
 		//генератор		
 		return (
