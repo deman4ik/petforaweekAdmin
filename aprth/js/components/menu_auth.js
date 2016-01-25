@@ -11,10 +11,6 @@ var AuthMenu = React.createClass({
 		return {
 		}
 	},
-	//перерисовка текущего состояния окно браузера
-	reloadWindow: function () {
-		this.context.router.refresh();
-	},
 	//обработка нажатия на "Вход"
 	handleLogIn: function () {
 		this.props.onMenuItemSelected({
@@ -24,10 +20,7 @@ var AuthMenu = React.createClass({
 			path: "/main",
 			authAccess: false
 		});
-		this.props.onLogIn({
-			actionType: AppAfterAuthActionTypes.CALLBACK, 
-			actionPrms: {callBack: this.reloadWindow, prms: {}}
-		});
+		this.props.onLogIn({actionType: AppAfterAuthActionTypes.REDIRECT, actionPrms: {link: "/"}});
 	},
 	//обработка нажатия на "Выход"
 	handleLogOut: function () {
@@ -38,10 +31,7 @@ var AuthMenu = React.createClass({
 			path: "/main",
 			authAccess: false
 		});
-		this.props.onLogOut({
-			actionType: AppAfterAuthActionTypes.CALLBACK, 
-			actionPrms: {callBack: this.reloadWindow, prms: {}}
-		});
+		this.props.onLogOut();
 	},
 	//инициализация компонента при подключении к страничке
 	componentDidMount: function() {		
