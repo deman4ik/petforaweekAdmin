@@ -154,7 +154,6 @@ var App = React.createClass({
 				session: tmpSession
 			}, 
 			function () {				
-				Utils.saveObjectState("sessionState", this.state.session);				
 				this.processAfterAuth();
 			}
 		);
@@ -166,6 +165,7 @@ var App = React.createClass({
 	//нажатие на кнопку "Выйти"
 	handleLogOut: function (prms) {
 		var afterAuthTmp = {};
+		Utils.buildClnt(config.defaultServer);
 		if(prms) {
 			afterAuthTmp = _.extend({}, prms);
 		} else {		
@@ -181,7 +181,6 @@ var App = React.createClass({
 				afterAuth: afterAuthTmp
 			}, 
 			function () {
-				Utils.deleteObjectState("sessionState");				
 				this.processAfterAuth();
 			}
 		);
@@ -199,21 +198,12 @@ var App = React.createClass({
 	},
 	//инициализация при старте приложения
 	componentDidMount: function () {
-		var sessionState = Utils.loadObjectState("sessionState");
 		this.handleResize();
 		window.addEventListener("resize", this.handleResize);		
-		if(sessionState) {
-			this.setState({session: sessionState, 
-				language: config.languageDefault,
-				languageEnabled: config.languagesEnabled,
-				appReady: true
-			});
-		} else {
-			this.setState({language: config.languageDefault,
-				languageEnabled: config.languagesEnabled,
-				appReady: true
-			});
-		}		
+		this.setState({language: config.languageDefault,
+			languageEnabled: config.languagesEnabled,
+			appReady: true
+		});				
 	},
 	//обновление свойств компонента
 	componentWillReceiveProps: function (newProps) {				
@@ -238,6 +228,7 @@ var App = React.createClass({
 													onDisplayProgress={this.showLoader}
 													onHideProgress={this.hideLoader}
 													onShowError={this.showDialogError}
+													defaultServer={config.defaultServer}
 													defaultUser={config.demoUser}
 													defaultPassword={config.demoPassword}
 													language={this.state.language}/>;

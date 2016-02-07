@@ -49,7 +49,7 @@ var AuthMenu = React.createClass({
 			onClickHandler = this.handleLogIn;
 		} else {
 			text = Utils.getStrResource({lang: this.props.language, code: "UI_MENU_AUTH_LOGOUT"}) + ": " 
-					+ ((this.props.session.sessionInfo.user.profile.firstName)?this.props.session.sessionInfo.user.profile.firstName:this.props.session.sessionInfo.user.profile.email);
+					+ (this.props.session.sessionInfo.user.userId.split(":")[1]) + " (" + serverConf.code + ")";
 			onClickHandler = this.handleLogOut;
 		}
 		return (

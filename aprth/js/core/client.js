@@ -13,7 +13,7 @@ var Client = function (clientConfig) {
 	}
 	//поддерживаемые серверные действия
 	var serverActions = {
-		login: "StandartLogin", //аутентификация
+		login: "AdminLogin", //аутентификация
 		getUserInfo: "User", //получение сведений о пользователе
 		article: "Article" //статьи
 	}
@@ -277,39 +277,8 @@ var Client = function (clientConfig) {
 						if(stdResp.STATE == respStates.ERR) {
 							callBack(stdResp);
 						} else {
-							var connectionData = Utils.deSerialize(stdResp.MESSAGE);							
-							execServerApi({
-								language: prms.language,
-								session: {
-									user: {
-										userId: connectionData.user.userId
-									},
-									authenticationToken: connectionData.authenticationToken
-								},
-								req: buildServerRequest({
-									language: prms.language,
-									action: serverActions.getUserInfo,
-									method: serverMethods.get,
-									data: null
-								}),
-								callBack: function (stdResp) {
-									if(stdResp.STATE == respStates.ERR) {
-										callBack(stdResp);
-									} else {
-										var profTmp =  Utils.deSerialize(stdResp.MESSAGE)[0];
-										if(!profTmp) {
-											callBack(fillSrvStdRespData(respTypes.STD, respStates.ERR, Utils.getStrResource({lang: prms.language, code: "SRV_USER_NOTFOUND"})));
-										} else {
-											if((!("emailConfirmed" in profTmp))||(!profTmp.emailConfirmed)) {
-												callBack(fillSrvStdRespData(respTypes.STD, respStates.ERR, Utils.getStrResource({lang: prms.language, code: "SRV_USER_NOT_CONFIRMED"})));
-											} else {											
-												connectionData.user.profile = profTmp;											
-												callBack(fillSrvStdRespData(respTypes.DATA, respStates.OK, connectionData));
-											}
-										}
-									}
-								}
-							});
+							var connectionData = Utils.deSerialize(stdResp.MESSAGE);
+							callBack(fillSrvStdRespData(respTypes.DATA, respStates.OK, connectionData));							
 						}
 					}
 				});				
@@ -353,6 +322,7 @@ var Client = function (clientConfig) {
 			try {
 				execServerApi({
 					language: prms.language,
+					session: prms.session,
 					req: buildServerRequest({
 						language: prms.language,
 						action: serverActions.article,
@@ -379,6 +349,7 @@ var Client = function (clientConfig) {
 			try {
 				execServerApi({
 					language: prms.language,
+					session: prms.session,
 					req: buildServerRequest({
 						language: prms.language,
 						action: serverActions.article,
@@ -405,6 +376,7 @@ var Client = function (clientConfig) {
 			try {
 				execServerApi({
 					language: prms.language,
+					session: prms.session,
 					req: buildServerRequest({
 						language: prms.language,
 						action: serverActions.article,
@@ -429,4 +401,6 @@ var Client = function (clientConfig) {
 	}
 }
 
-var clnt = new Client({serverAppUrl: config.serverAppUrl, serverAppKey: config.serverAppKey});
+var serverConf = {};
+var clnt = {};
+Utils.buildClnt(config.defaultServer);

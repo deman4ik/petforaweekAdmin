@@ -247,6 +247,13 @@ var Utils = {
 		else {
 			$(".u-sect-page-footer").css("position", "relative");
 		}
+	},
+	//сборка клиента для указанной конфигурации сервера
+	buildClnt: function (serverCode) {
+		serverConf = {};
+		clnt = {};
+		_.extend(serverConf, _.findWhere(serverList, {code: serverCode}));
+		_.extend(clnt, new Client({serverAppUrl: serverConf.addr, serverAppKey: serverConf.key}));
 	}
 }
 

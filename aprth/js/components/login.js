@@ -21,17 +21,9 @@ var LogInForm = React.createClass({
 					code: "CLNT_LOGIN_ERR"}), 
 				result.MESSAGE
 			);
-			if(result.MESSAGE == Utils.getStrResource({lang: this.props.language, code: "SRV_USER_NOT_CONFIRMED"})) {
-				this.props.onLogInCancel();
-				this.context.router.transitionTo("confirm", null, {userId: result.userId});
-			}
 		} else {
 			this.setState({sessionInfo: result.MESSAGE}, Utils.bind(function () {
-				if(("askForEmail" in this.state.sessionInfo)&&(this.state.sessionInfo.askForEmail)) {
-					this.setState({displayAskMail: true});
-				} else {
-					this.props.onLogInOk(this.state.sessionInfo);
-				}
+				this.props.onLogInOk(this.state.sessionInfo);				
 			}, this));			
 		}		
 	},
@@ -42,7 +34,11 @@ var LogInForm = React.createClass({
 			code: "CLNT_LOGIN_PROCESS"
 		}));
 		clnt.login({language: this.props.language, data: auth}, this.handleLogIn);
-	},	
+	},
+	//сборка нового клиента для выбранного сервера
+	buildNewClnt: function (serverCode) {
+		Utils.buildClnt(serverCode);
+	},
 	//обработка кнопки "Войти"
 	handleLogInClick: function () {
 		try {
@@ -103,7 +99,20 @@ var LogInForm = React.createClass({
 							</div>
 							<div className="u-form-body">
 								<form className="w-clearfix" role="form" id="loginForm">					
-									<div>
+									<div className="form-group">
+										<OptionsSelector classes={"w-select u-form-field"}
+											view={OptionsSelectorView.SELECT}
+											options={optionsFactory.buildOptions({
+														language: this.props.language, 
+														id: "server",
+														labels: _.pluck(serverList, "code"),
+														options: _.pluck(serverList, "code")})}
+											language={this.props.language}
+											defaultOptionsState={this.props.defaultServer}
+											appendEmptyOption={false}
+											onOptionChanged={Utils.bind(function (value) {this.buildNewClnt(value);}, this)}/>
+									</div>
+									<div className="form-group">
 											<input type="text" 
 												className="form-control"
 												placeholder={Utils.getStrResource({lang: this.props.language, code: "UI_PLH_USER"})}

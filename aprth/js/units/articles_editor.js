@@ -158,33 +158,42 @@ var AriclesEditor = React.createClass({
 	},
 	//добавление статьи
 	insertArticle: function (article) {
-		this.props.onDisplayProgress(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_PROGRESS"}));
-		var insPrms = {
-			language: this.props.language,
-			data: article
+		if(this.props.session.loggedIn) {
+			this.props.onDisplayProgress(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_PROGRESS"}));
+			var insPrms = {
+				language: this.props.language,
+				session: this.props.session.sessionInfo,
+				data: article
+			}
+			clnt.addArticle(insPrms, this.handleInsertArticleResult);
 		}
-		clnt.addArticle(insPrms, this.handleInsertArticleResult);		
 	},
 	//исправление статьи
 	updateArticle: function (article) {
-		this.props.onDisplayProgress(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_PROGRESS"}));
-		var d = {};
-		d.articleId = article.id;
-		_.extend(d, article)
-		var updPrms = {
-			language: this.props.language,
-			data: d
+		if(this.props.session.loggedIn) {
+			this.props.onDisplayProgress(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_PROGRESS"}));
+			var d = {};
+			d.articleId = article.id;
+			_.extend(d, article)
+			var updPrms = {
+				language: this.props.language,
+				session: this.props.session.sessionInfo,
+				data: d
+			}
+			clnt.updateArticle(updPrms, this.handleUpdateArticleResult);
 		}
-		clnt.updateArticle(updPrms, this.handleUpdateArticleResult);		
 	},
 	//удаление статьи
 	deleteArticle: function (articleId) {
-		this.props.onDisplayProgress(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_PROGRESS"}));
-		var delPrms = {
-			language: this.props.language,
-			articleId: articleId
+		if(this.props.session.loggedIn) {
+			this.props.onDisplayProgress(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_PROGRESS"}));
+			var delPrms = {
+				language: this.props.language,
+				session: this.props.session.sessionInfo,
+				articleId: articleId
+			}
+			clnt.removeArticle(delPrms, this.handleDeleteArticleResult);
 		}
-		clnt.removeArticle(delPrms, this.handleDeleteArticleResult);		
 	},
 	//инициализация при подключении компонента к странице
 	componentDidMount: function () {		
