@@ -279,7 +279,8 @@ var App = React.createClass({
 var routes = (
 	<Route name="app" handler={App} path="/">
 		<Route name="main" handler={Main}/>
-		<Route name="articles_editor" handler={AriclesEditor} path="articles_editor"/>		
+		<Route name="articles_editor" handler={AriclesEditor} path="articles_editor"/>
+		<Route name="mail_list" handler={MailList} path="mail_list"/>
 		<DefaultRoute handler={DefaultPage}/>
 		<NotFoundRoute handler={Unit404}/>		
 		<Redirect from="/" to="/main"/>

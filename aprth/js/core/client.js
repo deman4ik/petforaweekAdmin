@@ -15,7 +15,8 @@ var Client = function (clientConfig) {
 	var serverActions = {
 		login: "AdminLogin", //аутентификация
 		getUserInfo: "User", //получение сведений о пользователе
-		article: "Article" //статьи
+		article: "Article", //статьи
+		mailList: "Mail/List" //Список рассылки
 	}
 	//коды стандартных ответов сервера
 	var serverStdErrCodes = {
@@ -108,6 +109,11 @@ var Client = function (clientConfig) {
 				//считывание информации о пользователе
 				case (serverActions.getUserInfo): {
 					return fillSrvStdReqData(serverActions.getUserInfo, serverMethods.get, "");
+					break;
+				}
+				//получение списка e-mail для расслыки
+				case(serverActions.mailList): {
+					return fillSrvStdReqData(serverActions.mailList, serverMethods.get, "");
 					break;
 				}
 				//работа со статьями
@@ -296,6 +302,7 @@ var Client = function (clientConfig) {
 				if(prms.addLanguage != false) filter.lang = prms.language;				
 				execServerApi({
 					language: prms.language,
+					session: prms.session,
 					req: buildServerRequest({
 						language: prms.language,
 						action: serverActions.article,
@@ -397,7 +404,34 @@ var Client = function (clientConfig) {
 				if(Utils.isFunction(callBack))
 					callBack(fillSrvStdRespData(respTypes.STD, respStates.ERR, error.message));
 			}
-		}		
+		},
+		//считывание списка рассылки
+		getMailList: function (prms, callBack) {
+			try {
+				execServerApi({
+					language: prms.language,
+					session: prms.session,
+					req: buildServerRequest({
+						language: prms.language,
+						action: serverActions.mailList,
+						method: serverMethods.get,
+						data: {}
+					}),
+					callBack: function (resp) {
+						if(resp.STATE == respStates.ERR)
+							callBack(resp);
+						else {
+							resp.MESSAGE = Utils.deSerialize(resp.MESSAGE);
+							callBack(resp);
+						}
+					}
+				});
+			} catch (error) {
+				log(["GET MAIL LIST ERROR", error]);
+				if(Utils.isFunction(callBack))
+					callBack(fillSrvStdRespData(respTypes.STD, respStates.ERR, error.message));
+			}
+		}
 	}
 }
 

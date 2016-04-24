@@ -148,6 +148,7 @@ var AriclesEditor = React.createClass({
 			this.props.onDisplayProgress(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_PROGRESS"}));
 			var getPrms = {
 				language: this.props.language,
+				session: this.props.session.sessionInfo,
 				addLanguage: false,
 				filter: {}
 			}

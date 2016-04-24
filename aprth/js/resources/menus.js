@@ -13,7 +13,15 @@ var menus = [
 				path: "/articles_editor",
 				authAccess: true,
 				excludePaths: []
-			}			
+			},
+			{
+				code: "MailList", 
+				title: "UI_MAIN_MENU_MAIL_LIST", 
+				link: "mail_list",
+				path: "/mail_list",
+				authAccess: true,
+				excludePaths: []
+			}
 		]
 	}
 ]
