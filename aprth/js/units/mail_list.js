@@ -79,7 +79,6 @@ var MailList = React.createClass({
 			this.props.onShowError(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_ERROR"}), resp.MESSAGE);
 		} else {			
 			if(resp.MESSAGE) {
-				console.log(resp.MESSAGE);
 				var tmpList = {};
 				_.extend(tmpList, resp.MESSAGE);
 				this.setState({list: tmpList, listLoaded: true});
