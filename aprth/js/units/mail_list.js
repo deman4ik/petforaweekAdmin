@@ -1,6 +1,63 @@
 /*
 	Список рассылки
 */
+//список адресов
+var AddressList = React.createClass({
+	//выгрузка в CSV
+	exportCSV: function () {
+		var csvContent = "data:text/csv;charset=utf-8,Email,FirstName\n";
+		this.props.list.map(function(item, i) {
+			var dataString = item.email + "," + item.firstName;
+			csvContent += ((i < (this.props.list.length - 1))?(dataString + "\n"):(dataString));
+		}, this);
+		var encodedUri = encodeURI(csvContent);
+		var link = document.createElement("a");
+		link.setAttribute("href", encodedUri);
+		link.setAttribute("target", "_blank");
+		link.setAttribute("download", "mail_list.csv");
+		link.click();
+	},
+	//обработка нажатия на заголовок списка адресов
+	handleTitleClick: function () {
+		this.exportCSV();
+	},
+	//генерация представления списка
+	render: function () {
+		//строим список
+		var listItems = this.props.list.map(function (item, i) {
+			var titleColumn;
+			var formattedAddress;
+			if(i == 0) {
+				var tmpStyle = {verticalAlign: "top"};
+				_.extend(tmpStyle, this.props.cellStyle);
+				titleColumn = 	<td rowSpan={this.props.list.length} style={tmpStyle}>
+									<a href="javascript:void(0);" onClick={this.handleTitleClick}>{this.props.title}</a>
+								</td>
+				var formatedList = this.props.list.map(function (listItem, j) {
+					var tmp = (listItem.firstName + ((listItem.lastName == null)?"":(" " + listItem.lastName))) + " <" + listItem.email + ">";
+					return ((j < (this.props.list.length - 1))?(tmp + ", "):(tmp));
+				}, this);
+				formattedAddress =	<td rowSpan={this.props.list.length} style={tmpStyle}>
+										{formatedList}
+									</td>				
+			}
+			return (
+				<tr key={i}>
+					{titleColumn}
+					<td style={this.props.cellStyle}>{item.email}</td>
+					<td style={this.props.cellStyle}>{item.firstName + ((item.lastName == null)?"":(" " + item.lastName))}</td>
+					{formattedAddress}
+				</tr>
+			);
+		}, this);
+		//возвращаем его
+		return (
+			<span>
+				{listItems}
+			</span>
+		);
+	}
+});
 //список рассылки
 var MailList = React.createClass({	
 	//состояние редактора
@@ -9,7 +66,8 @@ var MailList = React.createClass({
 			listLoaded: false, //признак загруженности списка адресов
 			list: { //список адресов
 				allUsersList: [], //все пользователи
-				newsletterList: [] //подписанные на новости			
+				newsletterList: [], //подписанные на новости
+				norificationsList: [] //подписанные на оповещения
 			} 
 		}
 	},
@@ -21,7 +79,10 @@ var MailList = React.createClass({
 			this.props.onShowError(Utils.getStrResource({lang: this.props.language, code: "CLNT_COMMON_ERROR"}), resp.MESSAGE);
 		} else {			
 			if(resp.MESSAGE) {
-				this.setState({list: resp.MESSAGE, listLoaded: true});
+				console.log(resp.MESSAGE);
+				var tmpList = {};
+				_.extend(tmpList, resp.MESSAGE);
+				this.setState({list: tmpList, listLoaded: true});
 			} else {
 				this.setState({list: [], listLoaded: false});
 			}
@@ -48,11 +109,15 @@ var MailList = React.createClass({
 	//обновление свойств компонента
 	componentWillReceiveProps: function (newProps) {		
 	},
-	//генерация представления главной страницы
+	//генерация представления раздела
 	render: function () {
 		//стиль контейнера
 		var divStyle = {
 			padding: "5px"
+		};
+		//стиль таблицы
+		var tableStyle = {
+			width: "100%"
 		};
 		//стиль ячейки
 		var cellStyle = {
@@ -62,30 +127,31 @@ var MailList = React.createClass({
 		//статьи
 		var list;
 		if(this.state.listLoaded) {
-			var listItemsAll = this.state.list.allUsersList.map(function (item, i) {
-				return (<span key={i}>{item + "; "}</span>);
-			}, this);
-			var listItemsNews = this.state.list.newsletterList.map(function (item, i) {
-				return (<span key={i}>{item + "; "}</span>);
-			}, this);			
-			list =	<div>
-						<table>
+			list =	<div style={divStyle}>
+						<table style={tableStyle}>
 							<tr>
 								<td style={cellStyle}>
-									{Utils.getStrResource({lang: this.props.language, code: "UI_FLD_MAIL_LIST_ALL_USERS"})}
+									{Utils.getStrResource({lang: this.props.language, code: "UI_FLD_LIST"})}
 								</td>
 								<td style={cellStyle}>
-									{listItemsAll}
+									{Utils.getStrResource({lang: this.props.language, code: "UI_FLD_E_MAIL"})}									
 								</td>
+								<td style={cellStyle}>
+									{Utils.getStrResource({lang: this.props.language, code: "UI_FLD_NAME"})}									
+								</td>
+								<td style={cellStyle}>
+									{Utils.getStrResource({lang: this.props.language, code: "UI_FLD_FORMATED_ADDRESS"})}									
+								</td>								
 							</tr>
-							<tr>
-								<td style={cellStyle}>
-									{Utils.getStrResource({lang: this.props.language, code: "UI_FLD_MAIL_LIST_NEWS_USERS"})}
-								</td>
-								<td style={cellStyle}>
-									{listItemsNews}
-								</td>
-							</tr>
+							<AddressList list={this.state.list.allUsersList}
+								cellStyle={cellStyle} 
+								title={Utils.getStrResource({lang: this.props.language, code: "UI_FLD_MAIL_LIST_ALL_USERS"})}/>
+							<AddressList list={this.state.list.newsletterList}
+								cellStyle={cellStyle} 
+								title={Utils.getStrResource({lang: this.props.language, code: "UI_FLD_MAIL_LIST_NEWS_USERS"})}/>
+							<AddressList list={this.state.list.norificationsList}
+								cellStyle={cellStyle} 
+								title={Utils.getStrResource({lang: this.props.language, code: "UI_FLD_MAIL_LIST_NOTIFY_USERS"})}/>
 						</table>
 					</div>
 		}

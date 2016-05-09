@@ -3,7 +3,7 @@
 */
 var config = {
 	//код сервера по умолчанию (см. serverList в dicts.js)
-	defaultServer: "DEV",
+	defaultServer: "PROD",
 	//имя демонстрационного пользователя
 	demoUser: "",
 	//пароль демонстрационного пользователя
